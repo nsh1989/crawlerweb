@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시판 - 목록</title>
+  <link rel='stylesheet' href='/webjars/bootstrap/4.5.0/css/bootstrap.min.css'>
+</head>
+<body>
+<header th:insert="common/header.html"></header>
+<div class="container">
+  <select class="dropdown">
+    <option class="dropdown-item" th:each="i : ${contentslist}" th:text="${i.manufacturer}"></option>
+  </select>
+  <select class="dropdown">
+    <option class="dropdown-item" th:each="i : ${contentslist}" th:text="${i.model}"></option>
+  </select>
+  <select class="dropdown">
+    <option class="dropdown-item" th:each="i : ${contentslist}" th:text="${i.badge}"></option>
+  </select>
+  <select class="dropdown">
+    <option class="dropdown-item" th:each="i : ${contentslist}" th:text="${i.badgedetail}"></option>
+  </select>
+  <select class="dropdown">
+    <option class="dropdown-item" th:each="i : ${contentslist}" th:text="${i.formyear}"></option>
+  </select>
+  <table class="table">
+    <thead class="thead-light">
+    <tr class="text-center">
+      <!--            <th scope="col">#</th>-->
+      <th scope="col">브랜드</th>
+      <th scope="col">메인모델</th>
+      <th scope="col">서브모델</th>
+      <th scope="col">세부모델</th>
+      <th scope="col">년식</th>
+      <th scope="col">월수</th>
+      <th scope="col">주행거리</th>
+      <th scope="col">사고이력</th>
+      <th scope="col">단순수리</th>
+      <th scope="col">판매가</th>
+      <th scope="col">판매여부</th>
+      <th scope="col">자세히보기</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="text-center" th:each="contents : ${contentslist}">
+      <th scope="row">
+        <!--                <span th:text="${boards.id}"></span>-->
+        <span th:text="${contents.manufacturer}"></span>
+      </th>
+      <td>
+        <a th:href="@{'/boards/' + ${contents.id}}">
+          <span th:text="${contents.model}"></span>
+        </a>
+      </td>
+      <td>
+        <span th:text="${contents.badge}"></span>
+      </td>
+      <td>
+        <span th:text="${contents.badgedetail}"></span>
+        <!--                <span th:text="${#temporals.format(boards.badgedetail, 'yyyy-MM-dd HH:mm')}"></span>-->
+      </td>
+      <td>
+        <span th:text="${contents.formyear}"></span>
+        <!--                <span th:text="${#temporals.format(boards.badgedetail, 'yyyy-MM-dd HH:mm')}"></span>-->
+      </td>
+      <td>
+<!--        <span th:text="${contents.manufacturer}"></span>-->
+      </td>
+      <td>
+        <span th:text="${contents.mileage}"></span>
+      </td>
+      <td>
+        <span th:text="${contents.accident}"></span>
+      </td>
+      <td>
+        <span th:text="${contents.repair}"></span>
+      </td>
+      <td>
+        <span th:text="${contents.price}"></span>
+      </td>
+<!--      <td>-->
+<!--        <span th:if="${!contents.solddate.isEmpty()}">Y</span>-->
+<!--        <span th:if="${contents.solddate.isEmpty()}">N</span>-->
+<!--      </td>-->
+    </tr>
+    </tbody>
+  </table>
+  <div th:if="${!boards.isEmpty()}">
+    <nav
+            th:with="
+                pageNumber = ${boards.pageable.pageNumber},
+                pageSize = ${boards.pageable.pageSize},
+                totalPages = ${boards.totalPages},
+                startPage = ${T(Math).floor(pageNumber / pageSize) * pageSize + 1},
+                tempEndPage = ${startPage + pageSize - 1},
+                endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})"
+            aria-label="Page navigation"
+    >
+      <ul class="pagination ">
+
+        <li th:classappend="${pageNumber + 1 <= pageSize + 1} ? 'disabled'" class="page-item">
+          <a class="page-link" th:href="@{/(page=1-1)}">
+            <span>&laquo;</span>
+            <span class="sr-only">First</span>
+          </a>
+        </li>
+
+        <li th:classappend="${boards.first} ? 'disabled'" class="page-item">
+          <a class="page-link" th:href="${boards.first} ? '#' : @{/(page=${#numbers.formatDecimal(startPage - pageSize, 0, -1)}-1)}" aria-label="Previous">
+            <!-- 개인적으로 int 로 변환하는 법을 몰라서 이렇게 길어졌습니다 -->
+            <span aria-hidden="true">&lt;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+
+        <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+          <a th:text="${page}" class="page-link" th:href="@{/(page=${page}-1)}"></a>
+        </li>
+
+        <li th:classappend="${boards.last} ? 'disabled'" class="page-item">
+          <a class="page-link" th:href="${boards.last} ? '#' : @{/(page=${#numbers.formatDecimal(startPage + pageSize, 0, -1)}-1)}" aria-label="Next">
+            <span aria-hidden="true">&gt;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+
+        <li th:classappend=" ${T(Math).floor(totalPages/10)*10 <= startPage} ? 'disabled'" class="page-item">
+          <a class="page-link" th:href="@{/(page=${totalPages}-1)}">
+            <span>&raquo;</span>
+            <span class="sr-only">First</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </div>
+<!--  <div class="row">-->
+<!--    <div class="col-auto mr-auto"></div>-->
+<!--    <div class="col-auto">-->
+<!--      <a class="btn btn-primary" th:href="@{/post}" role="button">글쓰기</a>-->
+<!--    </div>-->
+<!--  </div>-->
+</div>
+<script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function(){
+    function getTable(page, size) {
+      let pageNumber = (typeof page != 'undefined') ? page :0;
+      let sizeNumber = (typeof size != 'undefined') ? page :10;
+
+      $.ajax({
+        type : "GET",
+        url : "/",
+        data:{
+          page : pageNumber,
+          size : sizeNumber
+        },
+        success: function(response){
+          response.contentslist
+          $('#contentslist')
+      })
+
+
+      }
+    }
+  });
+</script>
+</body>
+</html>
